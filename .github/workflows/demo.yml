@@ -3,8 +3,12 @@ on:
   push:
     branches:
       - main
+env: 
+  MONGODB_DB_NAME: demo_db
 jobs:
   test:
+    env: 
+      MONGODB_USERNAME: testing_user
     runs-on: ubuntu-latest
     # Test the code
     steps:
@@ -21,6 +25,9 @@ jobs:
         run: npm run lint
       - name: Test code
         run: npm run test
+      - name: Output information
+        run: |
+          echo "MONGODB_DB_NAME : ${{ env.MONGODB_DB_NAME }}, MONGODB_USERNAME : ${{ env.MONGODB_USERNAME }}"
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -49,6 +56,9 @@ jobs:
             #   |
             # dist
             # package.json
+      - name: Output information
+        run: |
+          echo "MONGODB_DB_NAME : ${{ env.MONGODB_DB_NAME }}, MONGODB_USERNAME : ${{ env.MONGODB_USERNAME }}"
   deploy:
     needs: build
     runs-on: ubuntu-latest
