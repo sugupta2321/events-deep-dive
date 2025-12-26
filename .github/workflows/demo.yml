@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       script_file: ${{ steps.publish.outputs.script_file }}
+    environment: TEST
     steps:
       - name: Get code
         uses: actions/checkout@v3
