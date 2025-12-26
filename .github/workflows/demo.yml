@@ -6,6 +6,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Test the code
     steps:
       - name: Get code
         uses: actions/checkout@v3
