@@ -4,11 +4,11 @@ on:
     branches:
       - main
 env: 
-  MONGODB_DB_NAME: demo_db
+  MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
 jobs:
   test:
     env: 
-      MONGODB_USERNAME: testing_user
+      MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
     runs-on: ubuntu-latest
     # Test the code
     steps:
