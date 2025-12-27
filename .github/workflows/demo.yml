@@ -1,21 +1,16 @@
-name: Deploy website
+name: Website Deployment
 on:
   push:
     branches:
       - main
-env: 
-  MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
 jobs:
-  test:
-    environment: TEST
-    env: 
-      MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+  lint:
     runs-on: ubuntu-latest
-    # Test the code
     steps:
       - name: Get code
         uses: actions/checkout@v3
-      - name: Cache Dependencies
+      - name: Cache dependencies
+        id: cache
         uses: actions/cache@v3
         with:
           path: ~/.npm
@@ -24,21 +19,34 @@ jobs:
         run: npm ci
       - name: Lint code
         run: npm run lint
-      - name: Test code
-        run: npm run test
-      - name: Output information
-        run: |
-          echo "MONGODB_DB_NAME : ${{ env.MONGODB_DB_NAME }}, MONGODB_USERNAME : ${{ env.MONGODB_USERNAME }}"
-  build:
-    needs: test
+  test:
     runs-on: ubuntu-latest
-    outputs:
-      script_file: ${{ steps.publish.outputs.script_file }}
-    environment: TEST
     steps:
       - name: Get code
         uses: actions/checkout@v3
-      - name: Cache Dependencies
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Test code
+        run: npm run test
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test.json
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Cache dependencies
+        id: cache
         uses: actions/cache@v3
         with:
           path: ~/.npm
@@ -46,32 +54,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build website
+        id: build-website
         run: npm run build
-      - name: Publish Filename
-        id: publish
-        run: find dist/assets -type f -name '*.js' -execdir echo 'script_file={}' >> $GITHUB_OUTPUT ';'
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
           name: dist-files
           path: dist
-            #   |
-            # dist
-            # package.json
-      - name: Output information
-        run: |
-          echo "MONGODB_DB_NAME : ${{ env.MONGODB_DB_NAME }}, MONGODB_USERNAME : ${{ env.MONGODB_USERNAME }}"
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with: 
+      - name: Get build artifacts
+        uses: actions/download-artifact@v3
+        with:
           name: dist-files
-      - name: List files
+      - name: Output contents
         run: ls
-      - name: Show script file
-        run: echo "Script file is ${{ needs.build.outputs.script_file }}"
       - name: Deploy
         run: echo "Deploying..."
