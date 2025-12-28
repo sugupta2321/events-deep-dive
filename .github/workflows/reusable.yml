@@ -1,8 +1,21 @@
 name: Deployment Workflow
-on: workflow_call
+on: 
+    workflow_call:
+        inputs:
+            artificat-name:
+                description: 'Name of the build artifact to deploy'
+                required: false
+                default: 'dist-files'
+                type: string
 jobs:
     deploy:
         runs-on: ubuntu-latest
         steps:
+            - name: Download Build Artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  name: ${{ inputs.artificat-name }}
+            - name: List Downloaded Files
+              run: ls -la
             - name: Output Deployment Message
               run: echo "Deploying application..."
