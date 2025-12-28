@@ -70,6 +70,8 @@ jobs:
     uses: ./.github/workflows/reusable.yml
     with:
       artificat-name: dist-files
+    #secrets:
+      #some-secret: ${{ secrets.some-secret }}
     needs: build
   report:
     needs: [lint, deploy]

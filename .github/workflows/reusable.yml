@@ -7,6 +7,10 @@ on:
                 required: false
                 default: dist-files
                 type: string
+        secrets:
+            some-secret:
+                description: 'A secret for deployment'
+                required: false
 jobs:
     deploy:
         runs-on: ubuntu-latest
