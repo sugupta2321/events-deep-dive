@@ -69,7 +69,7 @@ jobs:
   deploy:
     uses: ./.github/workflows/reusable.yml
     with:
-      artificat-name: 'dist-files'
+      artificat-name: dist-files
     needs: build
   report:
     needs: [lint, deploy]

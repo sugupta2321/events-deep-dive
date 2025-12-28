@@ -3,9 +3,9 @@ on:
     workflow_call:
         inputs:
             artificat-name:
-                description: 'Name of the build artifact to deploy'
+                description: Name of the build artifact to deploy
                 required: false
-                default: 'dist-files'
+                default: dist-files
                 type: string
 jobs:
     deploy:
