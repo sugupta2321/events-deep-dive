@@ -7,12 +7,18 @@ on:
                 required: false
                 default: dist-files
                 type: string
+        outputs:
+            result:
+                description: 'result of deployment'
+                value: ${{ jobs.deploy.outputs.outcome}}
         secrets:
             some-secret:
                 description: 'A secret for deployment'
                 required: false
 jobs:
     deploy:
+        outputs:
+            outcome: ${{ steps.set-result.outputs.step-result }}
         runs-on: ubuntu-latest
         steps:
             - name: Download Build Artifacts
@@ -23,3 +29,6 @@ jobs:
               run: ls -la
             - name: Output Deployment Message
               run: echo "Deploying application..."
+            - name: Set Deployment Result
+              id: set-result
+              run: echo "step-result=success" >> $GITHUB_OUTPUT
